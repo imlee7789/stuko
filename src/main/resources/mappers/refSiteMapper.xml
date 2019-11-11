@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace = "com.stuko.mapper.RefSiteMapper">
+
+	<select id="readRefSites" resultType="com.stuko.domain.RefSiteVO">
+		SELECT 
+			* 
+		FROM 
+			tbl_ref_site 
+		WHERE 
+			def_id=#{def_id}
+	</select>
+	
+	<insert id="insertRefSite">
+		INSERT INTO 
+			tbl_ref_site
+				(def_id, 
+				url, 
+				description)
+			VALUES
+				(#{def_id}, 
+				#{url}, 
+				#{description})
+	</insert>
+	
+	<update id="updateRefSite">
+		UPDATE 
+			tbl_ref_site
+		SET 
+			url=#{url}, 
+			description=#{description} 
+		WHERE id=#{id}
+	</update>
+	
+	<delete id="deleteRefSite">
+		DELETE FROM 
+			tbl_ref_site
+		WHERE
+			id=#{id}
+	</delete>
+</mapper>

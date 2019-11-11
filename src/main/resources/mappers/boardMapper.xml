@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace = "com.stuko.mapper.BoardMapper">
+
+	<insert id="create">
+		insert into tbl_bulletin (user_id, user_pw, content, course_id)
+		values(#{user_id},#{user_pw},#{content},#{course_id})
+	</insert>
+	
+	<select id="read" resultType="com.stuko.domain.BoardVO">
+		select
+			id, user_id, content, rcmd_cnt, comment_cnt, insert_ts
+		from
+			tbl_bulletin
+		where id = #{id}
+	</select>
+	
+	<select id="readLastOne" resultType="com.stuko.domain.BoardVO">
+		SELECT
+			id, user_id, content, rcmd_cnt, comment_cnt, insert_ts
+		FROM
+			tbl_bulletin
+		WHERE
+			id=(SELECT max(id)
+				FROM tbl_bulletin)
+			and course_id = #{course_id}
+	</select>
+	
+	<update id="update">
+		update tbl_bulletin set user_id = #{user_id}, user_pw = #{user_pw}, content = #{content}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from tbl_bulletin where id = #{id}
+	</delete>
+	
+	<select id="listAll" resultType="com.stuko.domain.BoardVO">
+		<![CDATA[
+			select
+				id, user_id, content, rcmd_cnt, comment_cnt, insert_ts
+			from
+				tbl_bulletin
+			where id > 0 and course_id = #{course_id}
+			order by id desc, insert_ts desc
+			limit #{pageStart}, #{length}
+		]]>
+	</select>
+	
+	<update id="recommend">
+		update tbl_bulletin set rcmd_cnt = rcmd_cnt+1 where id = #{id}
+	</update>
+	
+	<select id="checkPw" resultType="String">
+		SELECT
+			user_pw
+		FROM tbl_bulletin
+		WHERE id = #{id}
+	</select>
+	
+	<select id="listSearch" resultType="com.stuko.domain.BoardVO">
+		<![CDATA[
+			select
+				id, user_id, content, rcmd_cnt, comment_cnt, insert_ts
+			from
+				tbl_bulletin
+			where
+				id > 0 and course_id = #{course_id}
+		]]>
+		
+		<include refid="search"></include>
+		
+		<![CDATA[
+			order by id desc
+			limit #{pageStart}, #{length}
+		]]>
+	</select>
+	
+	<!-- <select id="listSearchCount" resultType="int">
+		<![CDATA[
+			select
+				count(id)
+			from
+				tbl_bulletin
+			where
+				id > 0
+		]]>
+		
+		<include refid="search"></include>
+		
+	</select> -->
+	
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 'all'.toString()">
+				and (
+					user_id like CONCAT('%', #{keyword}, '%')
+					OR
+					content like CONCAT('%', #{keyword}, '%')
+				)
+			</if>
+		</if>
+	</sql>
+	
+	<update id="updateCommentCnt">
+		update tbl_bulletin set comment_cnt = comment_cnt + #{amount} where id=#{id}
+	</update>
+	
+	<select id="hotTopic" resultType="com.stuko.domain.BoardVO">
+		select
+			id, user_id, content, rcmd_cnt, insert_ts, comment_cnt
+		from
+			tbl_bulletin
+		where
+			rcmd_cnt=(
+				select max(rcmd_cnt)
+				from tbl_bulletin
+				where date(insert_ts) = date_sub(#{insert_ts}, interval 1 day))
+			and
+			date(insert_ts) = date_sub(#{insert_ts}, interval 1 day)
+			and
+			course_id = #{course_id}
+		ORDER BY
+			id LIMIT 1
+	</select>
+</mapper>

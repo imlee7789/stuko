@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stuko.mapper.CommentMapper">
+
+	<select id="list" resultType="com.stuko.domain.CommentVO">
+		select
+		user_id, content, insert_ts
+		from
+		tbl_comment
+		where bulletin_id = #{bulletin_id}
+	</select>
+
+	<insert id="create">
+		insert into tbl_comment (user_id, content,
+		bulletin_id)
+		values(#{user_id},#{content},#{bulletin_id})
+	</insert>
+
+	<select id="getBoardId" resultType="int">
+		select
+			bulletin_id
+		from
+			tbl_comment
+		where
+			id=#{id}
+	</select>
+	
+	<select id="readLastOne" resultType="com.stuko.domain.CommentVO">
+		SELECT
+			id, user_id, content, insert_ts
+		FROM
+			tbl_comment
+		WHERE
+			id=(SELECT max(id)
+				FROM tbl_comment)
+			and bulletin_id = #{bulletin_id}
+	</select>
+
+</mapper>

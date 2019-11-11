@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace = "com.stuko.mapper.WordMapper">
+
+	<select id="readWord" resultType="com.stuko.domain.WordVO">
+		SELECT 
+			* 
+		FROM 
+			tbl_word
+		WHERE 
+			word_name=#{word_name} 
+			AND course_id=#{course_id}
+	</select>
+
+	<select id="readWordsMatched" resultType="string">
+		SELECT 
+			word_name 
+		FROM 
+			tbl_word 
+		WHERE 
+			word_name
+				LIKE concat('%',#{word_name},'%')
+			AND course_id=#{course_id}
+	</select>
+
+	<insert id="createWord">
+		INSERT INTO 
+			tbl_word 
+			(word_name, course_id) 
+			VALUES (#{word_name}, #{course_id})
+	</insert>
+	
+	<delete id="deleteWord">
+		DELETE FROM 
+			tbl_word 
+		WHERE id=#{id}
+	</delete>
+	
+</mapper>

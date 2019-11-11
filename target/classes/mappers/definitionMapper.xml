@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace = "com.stuko.mapper.DefinitionMapper">
+
+	<select id="readDefs" resultType="com.stuko.domain.DefinitionVO">
+		SELECT 
+			* 
+		FROM 
+			tbl_definition
+		WHERE 
+			word_id=
+				(SELECT 
+					tbl_word.id 
+				FROM 
+					tbl_word 
+				WHERE 
+					word_name=#{word_name} 
+					AND course_id=#{course_id})
+		ORDER BY 
+			rcmd_cnt DESC, 
+			insert_ts ASC
+	</select>
+	
+	<insert id="insertDef">
+		INSERT INTO 
+			tbl_definition
+				(word_id, 
+				content, 
+				login_id) 
+			VALUES (
+				#{word_id},
+				#{content}, 
+				#{login_id})
+	</insert>
+	
+	<select id="getLastInsertedId" resultType="int">
+		SELECT 
+			max(id) 
+		FROM 
+			tbl_definition
+	</select>
+	
+	<update id="updateDef">
+		UPDATE 
+			tbl_definition 
+		SET 
+			content=#{content} 
+		WHERE 
+			id=#{id}
+	</update>
+	
+	<update id="increaseRcmdCnt">
+		UPDATE 
+			tbl_definition
+		SET 
+			rcmd_cnt=rcmd_cnt+1 
+		WHERE 
+			id=#{id}
+	</update>
+	
+	<delete id="deleteDef">
+		DELETE FROM
+			 tbl_definition
+		WHERE 
+			id=#{id}
+	</delete>
+
+</mapper>
