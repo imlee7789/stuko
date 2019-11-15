@@ -11,7 +11,7 @@ import com.stuko.domain.SearchCriteria;
 
 public interface BoardDAO {
 
-	public void create(BoardDTO dto) throws Exception;
+	public int create(BoardDTO dto) throws Exception;
 	
 	public BoardVO readOne(int id) throws Exception;
 	

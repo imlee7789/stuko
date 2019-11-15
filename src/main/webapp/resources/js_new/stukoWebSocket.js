@@ -24,6 +24,10 @@
     function convertEnter(text){
     	return text.split("\n").join("<br>");
     }
+    
+    function convertEnterReverse(text){
+    	return text.split("<br>").join("\n");
+    }
 
     function isExist(opt){
         if(typeof opt == "undefined" || opt == null) {
@@ -93,11 +97,13 @@
                 text(chatTime));
         
         var isBottom = isScrollBottom("#stuko_chatting_view");
-        
+
+        _chat.hide();
         $("#stuko_chatting_view").append(_chat);
+        _chat.show("fade", 100);
 
         if(isBottom){
-        	scrollSetBottom("#stuko_chatting_view");        	
+        	scrollSetBottom("#stuko_chatting_view");
         }
     }
     /////////////////////////////
@@ -152,8 +158,11 @@
 			type: "post",
 			data: data,
 			dataType: "json",
-			success: function(detail){
-				
+			success: function(comment){
+				console.log(comment);
+	            appendComment(comment, null);
+	            var commentArea = $(".stuko_modal_comment_input");
+	            commentArea.val("");
 			},
 			error:function(data){
 				console.log("error : ", data);
@@ -192,22 +201,22 @@
     		};
     		
         	$.ajax({
-    			url: "/stuko/1/timeline/" + id + "?user_pw=" + user_pw,
+    			url: "/stuko/1/timeline/" + id,
     			type: "delete",
     			dataType: "json",
+    			data: data,
     			success: function(detail){
     				console.log("_deleteArticle() succeed.");
 
-//    				var _okCallback = function(){
-//    					var modals = $(".stuko_modal_content");
-//    					for(var modal in modals){
-//    						modal.close();
-//    					}
-//    				}
+    				var _okCallback = function(){
+    					// NOT-FIXED
+    					// 새로고침하면 안된다. 채팅이 날아가기 때문에...
+    					location.reload();
+    				}
     				
 	            	var opt = {
 	            			bodyHtml: $("<div></div>").html("게시글 삭제 성공"),
-//	            			okBtnCallback: _okCallback,
+	            			okBtnCallback: _okCallback,
 	            			headText: "Delete"
 	            	};
 	            	
@@ -218,25 +227,15 @@
     			},
     			error:function(data){
     				
-//    				var _okCallback = function(){
-//    					var modals = $(".stuko_modal_content");
-//    					for(var modal in modals){
-//    						modal.close();
-//    					}
-//    				}
+    				var _okCallback = function(){
+    					location.reload();
+    				}
     				console.log("error : " ,data);
     				
-    				var text = "게시글 삭제 실패";
-    				
-    				if(data.status == 200) {
-    					text = "게시글 삭제 성공"
-    				}
+    				var text = "비밀번호가 틀렸습니다";
 
-    				console.log(text);
-    				
 	            	var opt = {
 	            			bodyHtml: $("<div></div>").html(text),
-//	            			okBtnCallback: _okCallback,
 	            			headText: "Delete"
 	            	};
 	            	
@@ -312,12 +311,17 @@
 
             	var bodyHtml = 
                 		$("<div></div>").
-                		text("추천하셨습니다.");
+                		text("추천하셨습니다");
             	
             	var opt = {
             			bodyHtml: bodyHtml,
             			headText: "Recommend"
             	};
+            	
+            	var rcmdSpan = $(".modal_bulletin_rcmd_btn");
+            	var rcmdCnt = parseInt(rcmdSpan.text())+1;
+
+            	rcmdSpan.text(rcmdCnt);
             	
             	var confirm = new Modal(opt);
             	
@@ -328,7 +332,7 @@
 				console.log("error : " ,data);
             	var bodyHtml = 
             		$("<div></div>").
-            		text("추천하셨습니다.");
+            		text("추천 실패");
         	
 	        	var opt = {
 	        			bodyHtml: bodyHtml,
@@ -369,7 +373,7 @@
 			dataType: "json",
 			success: function(respCommentList){
 				
-				RenderDetialModal(detail, respCommentList);
+				RenderDetailModal(detail, respCommentList);
 				
 			},
 			error:function(data){
@@ -377,10 +381,184 @@
 			}			
 		});
     }
+    
+
+    function _updateArticle(id){
+    	console.log("registerArticle() invoked.");
+    	
+    	var data = {
+    			user_id: $("#update_user_name").val(),
+    			user_pw: $("#update_user_pswd").val(),
+    			content: convertEnter($("#update_content").val())
+    	};
+    	
+    	console.log(data);
+    	
+		$.ajax({
+			url: "/stuko/1/timeline/" + id,
+			type: "put",
+			data: data,
+			dataType: "json",
+			success: function(data){
+				console.log("_registerArticle()::ajax::success");
+				
+				var _okCallback = function(){
+					//modal클로즈
+					var modals = $(".stuko_modal");
+					for(var i=0; i<modals.length; i++){
+						$(modals[i]).remove();
+					}
+				}
+
+            	var opt = {
+            			bodyHtml: $("<div></div>").html("글 수정 성공"),
+            			okBtnCallback: _okCallback,
+            			headText: "Success"
+            	};
+            	
+            	var confirm = new Modal(opt);
+            	
+                 	confirm.create();
+				
+			},
+			error:function(data){
+				console.log("_registerArticle()::ajax::error");
+				console.log("error : ", data);
+
+				var text = "비밀번호가 틀렸습니다";
+
+            	var opt = {
+            			bodyHtml: $("<div></div>").html(text),
+            			headText: "Update"
+            	};
+            	
+            	var confirm = new Modal(opt);
+            	
+            	confirm.create();
+			}			
+		});
+    	
+    };
+    
+    
+    function _openUpdateModal(id){
+    	console.log("_openUpdateModal() invoked.");
+
+    	$.ajax({
+			url: "/stuko/1/timeline/" + id,
+			type: "get",
+			dataType: "json",
+			success: function(detail){
+
+		    	var bodyHtml = 
+		    			$("<div></div>").
+		    			addClass("modal_update_body");
+		    	
+		    	var bodyHtmlText = 
+			        "<div class='modal_update_body'>" +
+			    		"<h2 id='modal_update_action_type'>글 수정</h2>" +
+			    		"<table class='modal_update_table'>" +
+			                "<tr class='modal_update_author'>" +
+			                    "<td>작성자 명</td>" +
+			                    "<td><input disabled type='text' id='update_user_name'></td>" +
+			                    "<td>비밀번호</td>" +
+			                    "<td><input type='password' id='update_user_pswd'></td>" +
+			                "</tr>" +
+			                "<tr class='modal_update_content'>" +
+			                    "<td>내용</td>" +
+			                    "<td colspan='3'>" +
+			                        "<textarea id='update_content'></textarea>" +
+			                    "</td>" +
+			                "</tr>" +
+			            "</table>" +
+			        "</div>";
+		    	
+		    	bodyHtml.html(bodyHtmlText);
+		    	
+		    	bodyHtml.find("#update_user_name").val(detail.user_id);
+		    	bodyHtml.find("#update_content").text(convertEnterReverse(detail.content));
+		    	
+		    	var regiBtn = 
+		    			$("<button></button>").
+		    			attr("id", "modal_update_regi_btn").
+		    			text("수정").
+		    			on("click", function(){
+		    				_updateArticle(id);
+		    			});
+		    	
+		    	var _cancelCallback = function(){
+
+		        	var bodyHtml = 
+		            		$("<div></div>").
+		            		text("정말 글 수정을 중단하시겠습니까?");
+
+		        	var _okCallback = function(){
+						var modals = $(".stuko_modal");
+						for(var i=0; i<modals.length; i++){
+							$(modals[i]).remove();
+						}
+		        	}
+		        	
+		        	var opt = {
+		        			bodyHtml: bodyHtml,
+		        			okBtnCallback: _okCallback,
+		        			headText: "Update"
+		        	};
+		        	
+		        	var confirm = new Modal(opt);
+		        	
+		        	confirm.create();
+		    	}
+		    	
+		    	var cancelBtn = 
+		    			$("<button></button>").
+		    			attr("id", "modal_update_cancel_under_btn").
+		    			text("취소").
+		    			on("click", function(){
+		    				_cancelCallback();
+		    				
+		    			});
+
+		    	var btns = 
+		    			$("<div></div>").
+		    			addClass("modal_update_btns").
+		    			append(regiBtn).
+		    			append(cancelBtn);
+		    	
+		    	bodyHtml.find(".modal_update_body").append(btns);
+		        
+		    	var opt = {
+		                /* Modal Position */
+		                top: "5vh",
+		                left: "calc(50vw - 350px)",
+
+		                /* Modal Size */
+		                width: "700px",
+		                height: "85vh",
+		                
+		        		bodyHtml: bodyHtml,
+		        		headText: "Update article",
+		                isFooter: false,
+		                cancelCallback: _cancelCallback,
+		                closable:false
+		        	};
+		        	
+		    	var updateModal = new Modal(opt);
+		    	
+		    	updateModal.create();
+				
+			},
+			error:function(data){
+				console.log("error : " ,data);
+			}
+		});
+    	
+    }
+    
 
     /* ArticleModal - step 3 */
-    function RenderDetialModal(detail, respCommentList){
-    	console.log("RenderDetialModal() invoked.");
+    function RenderDetailModal(detail, respCommentList){
+    	console.log("RenderDetailModal() invoked.");
     	
     	/* Option */
         var option = {
@@ -442,7 +620,9 @@
 	                $("<i></i>").
 	                addClass("stuko_text_btn").
 	                addClass("modal_bulletin_update_btn").
-	                addClass("far fa-edit")
+	                addClass("far fa-edit").on("click", function(){
+	                	_openUpdateModal(detail.id);
+	                })
 	            );
 
         var deleteBtn =
@@ -695,7 +875,11 @@
 
             case _reqType.BOARD_TIMELINE:
                 var newArticle = new Article(data);
+                
+                newArticle.hide();
                 $(".stuko_article_list").prepend(newArticle);
+                newArticle.show("blind", 800);
+                
                 break;
                 
             default :
@@ -706,7 +890,7 @@
     } // _onMessage
     
     function _onOpen(event){
-        // nickhcange를 여기서 해야할듯?
+        // nickhchange를 여기서 해야할듯?
         console.log("_onOpen()");
     }
 
@@ -887,12 +1071,166 @@
 		
     	
     };
+    
+    function _registerArticle(){
+    	console.log("registerArticle() invoked.");
+    	
+    	var data = {
+    			user_id: $("#update_user_name").val(),
+    			user_pw: $("#update_user_pswd").val(),
+    			content: convertEnter($("#update_content").val())
+    	};
+    	
+    	console.log(data);
+    	
+		$.ajax({
+			url: "/stuko/1/timeline",
+			type: "post",
+			data: data,
+			dataType: "json",
+			success: function(data){
+				console.log("_registerArticle()::ajax::success");
+				
+				var _okCallback = function(){
+					//writemodal클로즈
+					var modals = $(".stuko_modal");
+					for(var i=0; i<modals.length; i++){
+						$(modals[i]).remove();
+					}
+				}
+
+            	var opt = {
+            			bodyHtml: $("<div></div>").html("글 쓰기 성공"),
+            			okBtnCallback: _okCallback,
+            			headText: "Success"
+            	};
+            	
+            	var confirm = new Modal(opt);
+            	
+            	confirm.create();
+				
+			},
+			error:function(data){
+				console.log("_registerArticle()::ajax::error");
+				console.log("error : ", data);
+			}			
+		});
+    	
+    };
+    
+    function _openWriteModal(){
+    	console.log("_openWriteModal() invoked.");
+    	
+    	var bodyHtml = 
+    			$("<div></div>").
+    			addClass("modal_update_body");
+    	
+    	var bodyHtmlText = 
+	        "<div class='modal_update_body'>" +
+	    		"<h2 id='modal_update_action_type'>글 쓰기</h2>" +
+	    		"<table class='modal_update_table'>" +
+	                "<tr class='modal_update_author'>" +
+	                    "<td>작성자 명</td>" +
+	                    "<td><input type='text' id='update_user_name'></td>" +
+	                    "<td>비밀번호</td>" +
+	                    "<td><input type='password' id='update_user_pswd'></td>" +
+	                "</tr>" +
+	                "<tr class='modal_update_content'>" +
+	                    "<td>내용</td>" +
+	                    "<td colspan='3'>" +
+	                        "<textarea id='update_content'></textarea>" +
+	                    "</td>" +
+	                "</tr>" +
+	            "</table>" +
+	        "</div>";
+    	
+    	bodyHtml.html(bodyHtmlText);
+    	
+
+    	var regiBtn = 
+    			$("<button></button>").
+    			attr("id", "modal_update_regi_btn").
+    			text("등록").
+    			on("click", function(){
+    				console.log("등록");
+    				_registerArticle();
+    			});
+    	
+    	var _cancelCallback = function(){
+
+        	var bodyHtml = 
+            		$("<div></div>").
+            		text("정말 글쓰기를 취소하시겠습니까?");
+
+        	var _okCallback = function(){
+				var modals = $(".stuko_modal");
+				for(var i=0; i<modals.length; i++){
+					$(modals[i]).remove();
+				}
+        	}
+        	
+        	var opt = {
+        			bodyHtml: bodyHtml,
+        			okBtnCallback: _okCallback,
+        			headText: "Delete"
+        	};
+        	
+        	var confirm = new Modal(opt);
+        	
+        	confirm.create();
+    	}
+    	
+    	var cancelBtn = 
+    			$("<button></button>").
+    			attr("id", "modal_update_cancel_under_btn").
+    			text("취소").
+    			on("click", function(){
+    				_cancelCallback();
+    				
+    			});
+
+    	var btns = 
+    			$("<div></div>").
+    			addClass("modal_update_btns").
+    			append(regiBtn).
+    			append(cancelBtn);
+    	
+    	bodyHtml.find(".modal_update_body").append(btns);
+        
+    	var opt = {
+                /* Modal Position */
+                top: "5vh",
+                left: "calc(50vw - 350px)",
+
+                /* Modal Size */
+                width: "700px",
+                height: "85vh",
+                
+        		bodyHtml: bodyHtml,
+        		headText: "New article",
+                isFooter: false,
+                cancelCallback: _cancelCallback,
+                closable:false
+        	};
+        	
+    	var writeModal = new Modal(opt);
+    	
+    	writeModal.create();
+    	
+    }
+    
+    function _NaviInit(){
+    	$("#write_btn").on("click", function(){
+    		_openWriteModal();
+    	});
+    }
 
 
     /****************************************
     *   Initialize
     ****************************************/
     _BoardInit();
+    _NaviInit();
     _WebSocketInit();
     _ChatInit();
     

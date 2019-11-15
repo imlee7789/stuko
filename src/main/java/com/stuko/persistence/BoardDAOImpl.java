@@ -27,11 +27,11 @@ public class BoardDAOImpl implements BoardDAO {
 	private static String namespace = "com.stuko.mapper.BoardMapper";
 
 	@Override
-	public void create(BoardDTO dto) throws Exception {
+	public int create(BoardDTO dto) throws Exception {
 
 		log.info("BoardDAOImpl :: create() invoked.");
 
-		session.insert(namespace + ".create", dto);
+		return session.insert(namespace + ".create", dto);
 	}
 
 	@Override

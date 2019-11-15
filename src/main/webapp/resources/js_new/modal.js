@@ -8,6 +8,14 @@
 *   modal.hide();
 *   modal.destroy();
 ****************************************/
+// 개선사항 1
+// ok버튼 클릭시 무조건 destroy를 하면안된다.
+// 예를 들어 확인이 아닌 '등록'이라는 동작을 할 때
+// 등록 실패 시 모달을 꺼버린다면 써놓은 글이 날아간다.
+// 이것은 일반적이지 않으며 불편하다.
+
+// 개선사항 2
+// closeCallback이벤트를 등록할 수 있게 해야한다.
 var Modal = Modal || {};
 
 Modal = function(option){
@@ -48,6 +56,7 @@ Modal = function(option){
 
         /* Header options */
         headText: null,
+        
         // Dependency : jQuery-ui
         isDraggable: true,
 
@@ -62,8 +71,10 @@ Modal = function(option){
         cancelBtnText: "취소",
         
         okBtnCallback: null,        
-        cancelCallback: null
+        cancelCallback: null,
         
+        /* NOT-FIXED */
+        closable: true
     };
 
 
@@ -107,6 +118,9 @@ Modal = function(option){
             /* Modal Options */
             if(isOptValid(option.isBgClosable)){
                 _option.isBgClosable = option.isBgClosable;
+            }
+            if(isOptValid(option.closable)){
+            	_option.closable = option.closable;
             }
     
             /* Header options */
@@ -300,21 +314,31 @@ Modal = function(option){
         $("body").append(_modal);
         _modal.fadeIn();
     }
+    
     function _destroy(_callback){
         console.log("_destroy");
+        console.log(_option);
 
-        _modal.fadeOut(150, function(){
-            $(_modal).remove();
-    
+        if(_option.closable){
+	        _modal.fadeOut(150, function(){
+	                $(_modal).remove();	
+	    
+	            if(isOptValid(_callback)){
+	                _callback();
+	            }
+	        });
+	        
+        }else{
             if(isOptValid(_callback)){
                 _callback();
-            }
-        });
+            }        	
+        }
     }
     function _show(){
         _modal.show();
     }
     function _hide(){
+    	console.log("modal::_hide()")
         _modal.hide();
     }
     function _getElement(){

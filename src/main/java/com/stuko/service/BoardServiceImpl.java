@@ -24,11 +24,15 @@ public class BoardServiceImpl implements BoardService {
 	private BoardDAO dao;
 
 	@Override
-	public void regist(BoardDTO dto) throws Exception {
+	public boolean regist(BoardDTO dto) throws Exception {
 		
 		log.info("BoardServiceImpl :: regist(BoardDTO dto) invoked");
 		
-		dao.create(dto);
+		if(dao.create(dto) == 1) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 
 	@Override

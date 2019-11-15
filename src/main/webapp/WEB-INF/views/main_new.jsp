@@ -35,7 +35,7 @@
             <img class="stuko_logo" src="../../resources/images/img_logo_white.png">
         </header>
         <ul>
-            <li class="stuko_btn">
+            <li id="write_btn" class="stuko_btn">
                 <i class="fas fa-pencil-alt"></i>
                 <span>글 쓰기</span>
             </li>

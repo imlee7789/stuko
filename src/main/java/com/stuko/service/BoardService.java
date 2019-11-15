@@ -11,7 +11,7 @@ import com.stuko.domain.SearchCriteria;
 
 public interface BoardService {
 
-	public void regist(BoardDTO dto) throws Exception;
+	public boolean regist(BoardDTO dto) throws Exception;
 	
 	public BoardVO readOne(int boardId) throws Exception;
 	

@@ -127,7 +127,7 @@ public class StukoController {
 	// 1. 게시글 생성, 빈칸은 뷰에서 처리해주기.
 	@RequestMapping(value = "/*/timeline", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<BoardDTO> registPOST(BoardDTO dto, HttpServletRequest request, uriCutter cutter)
+	public BoardVO registPOST(BoardDTO dto, HttpServletRequest request, HttpServletResponse response, uriCutter cutter)
 			throws Exception {
 
 		log.info("regist post--------------------");
@@ -139,62 +139,72 @@ public class StukoController {
 
 		log.info(">>>>> courseid : " + courseid);
 
-		service.regist(dto);
-
-		ResponseEntity<BoardDTO> responseEntity = 
-				new ResponseEntity<BoardDTO>(dto, HttpStatus.OK);
+		boolean isSucceed = service.regist(dto);
 		
-		Message message = new Message();
+		if(isSucceed) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			
+			Message message = new Message();
 
-		BoardVO vo = service.readLastOne(courseid);
+			BoardVO vo = service.readLastOne(courseid);
+			
+			message.setReqType(Message.REQ_TIMELINE);
+			message.setId(vo.getId());
+			message.setUser_id(vo.getUser_id());
+			message.setContent(vo.getContent());
+			message.setRcmd_cnt(vo.getRcmd_cnt());
+			message.setInsert_ts(vo.getInsert_ts());
+			message.setComment_cnt(vo.getComment_cnt());
 
-		message.setReqType(Message.REQ_TIMELINE);
-		message.setId(vo.getId());
-		message.setUser_id(vo.getUser_id());
-		message.setContent(vo.getContent());
-		message.setRcmd_cnt(vo.getRcmd_cnt());
-		message.setInsert_ts(vo.getInsert_ts());
-		message.setComment_cnt(vo.getComment_cnt());
-
-		Collection<StukoSession> sessions = ssm.getSessions();
-		for (StukoSession ss : sessions) {
-			try {
-				int cId = Integer.parseInt(ss.getCourseId());
-				if (cId == courseid) {
-					ss.getSession().getBasicRemote().sendObject(message);
+			Collection<StukoSession> sessions = ssm.getSessions();
+			for (StukoSession ss : sessions) {
+				try {
+					int cId = Integer.parseInt(ss.getCourseId());
+					if (cId == courseid) {
+						ss.getSession().getBasicRemote().sendObject(message);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
+			
+			return vo;
+			
+		}else {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+			return null;
 		}
-		
-		return responseEntity;
 	}
 	
 	// 2. 게시글 삭제
 	@RequestMapping(value = "/*/timeline/*", method = RequestMethod.DELETE)
 	@ResponseBody
-	public void remove(@RequestParam("user_pw") String user_pw, Model model, Criteria cri,
+//	public void remove(@RequestParam("user_pw") String user_pw, Model model, Criteria cri,
+	public BoardDTO remove(BoardDTO dto, Model model, Criteria cri,
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			uriCutter cutter) throws Exception {
 
 		log.info("BoardController :: remove invoked.");
+		log.info("password : " + dto.getUser_pw());
 		
-		System.out.println();
-
-		int id = cutter.getBoardId(request);
-
-		boolean result = service.check_pw(id, user_pw);
+		int boardId = cutter.getBoardId(request);
+		
+		boolean result = service.check_pw(boardId, dto.getUser_pw());
+		
+		BoardDTO sdto = new BoardDTO();
+		
 		if (result) {
-
-			service.remove(id);
+			service.remove(boardId);
+			sdto.setId(boardId);
 			response.setStatus(HttpServletResponse.SC_OK);
 			
 		} else {
-
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
+		
+		return sdto;
 	}
 
 	// 3. 게시글 자세히 보기
@@ -218,28 +228,43 @@ public class StukoController {
 
 		int comUseBoardId = cutter.getcomUseBoardId(request);
 
-		List<CommentVO> vo = cService.commentRead(comUseBoardId);
+		List<CommentVO> commentlist = cService.commentRead(comUseBoardId);
 
 		log.info(">>>>>>> id : " + comUseBoardId);
 
-		return vo;
+		return commentlist;
 	}
 
 	// 4. 게시글 수정
 	@RequestMapping(value = "/*/timeline/*", method = RequestMethod.PUT)
-	public ResponseEntity<BoardDTO> modifyPUT(BoardDTO dto, HttpServletRequest request, uriCutter cutter)
-			throws Exception {
+	@ResponseBody
+	public BoardDTO modifyPUT(
+			BoardDTO dto, 
+			HttpServletRequest request, 
+			HttpServletResponse response, 
+			uriCutter cutter)
+		throws Exception {
 
 		log.info("BoardController :: modifyPUT invoked.");
 
 		int boardId = cutter.getBoardId(request);
+		
+		boolean result = service.check_pw(boardId, dto.getUser_pw());
 
-		dto.setId(boardId);
-		service.modify(dto);
+		BoardDTO sdto = new BoardDTO();
+		sdto.setId(dto.getId());
+		
+		if(result) {
+			dto.setId(boardId);
+			service.modify(dto);
+			
+			response.setStatus(HttpServletResponse.SC_OK);
+			
+		}else {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		}
 
-		ResponseEntity<BoardDTO> responseEntity = new ResponseEntity<BoardDTO>(dto, HttpStatus.OK);
-
-		return responseEntity;
+		return sdto;
 	}
 
 	// 4-1. 게시글 수정시 pw체크
@@ -264,8 +289,12 @@ public class StukoController {
 
 	// 5. 게시글 추천
 	@RequestMapping(value = "/*/timeline/*", method = RequestMethod.PATCH)
-	public void rcmd_cnt(BoardDTO dto, HttpServletResponse response, HttpServletRequest request, uriCutter cutter)
-			throws Exception {
+	@ResponseBody
+	public BoardDTO rcmd_cnt(BoardDTO dto, 
+			HttpServletResponse response, 
+			HttpServletRequest request, 
+			uriCutter cutter)
+		throws Exception {
 
 		log.info("BoardController :: rcmd_cnt invoked.");
 
@@ -274,6 +303,12 @@ public class StukoController {
 		service.rcmd_up(boardId);
 
 		response.setStatus(HttpServletResponse.SC_OK);
+		
+		BoardDTO sdto = new BoardDTO();
+		
+		sdto.setId(boardId);
+		
+		return sdto;
 	}
 
 	// 6. 검색
