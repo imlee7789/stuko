@@ -211,6 +211,15 @@ button{
 .stuko_nav>footer>div>i{
 	width: 30px;
 }
+.stuko_nav_toggle{
+	-webkit-box-shadow: 10px 0 0 0 rgba(1, 1, 1, 0.4);
+	box-shadow: 10px 0 0 0 rgba(1, 1, 1, 0.4);
+	border-bottom: solid 1px rgba(1, 1, 1, 0.4) !important;
+	color: #cc816d !important;
+	background-color: white !important;
+
+	font-weight: bold;
+}
 
 .stuko_nav>footer{
 	height: 10vh;
@@ -251,15 +260,13 @@ button{
 .stuko_timeline_search{
 	height: 40px;
 	margin: 0px 10px;
-
 	overflow: hidden;
-
 	border: solid #cc816d 1px;
 	border-radius: 10px;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	-ms-border-radius: 10px;
-	-o-border-radius: 10px;
+	-webkit-border-radius:;
+	-moz-border-radius:;
+	-ms-border-radius:;
+	-o-border-radius:;
 }
 .stuko_timeline_search>input{
 	display: block;
@@ -351,7 +358,7 @@ button{
 
 .article_footer {
 	height: 35px;
-	color: grey;
+	color: darkgrey;
 	font-size: 0.9rem;
 	font-weight: bolder;
 }
@@ -780,3 +787,335 @@ button{
 .modal_update_btns>button:active {
 	background-color: #bc715d;
 }
+
+
+/**********************************************
+* Stuko_dictionary
+**********************************************/
+.stuko_dict {
+	/* Layout */
+	display: none;
+	position: absolute;
+	overflow: none;
+	/* left: 270px; */
+	left: 255px;
+
+	/* Box */
+	/* width: calc(50vw - 145px); */
+	/* height: calc(100vh - 20px); */
+	width: calc(50vw - 135px);
+	height: 100%;
+	/* margin: 10px; */
+
+	/* Border */
+	outline: none;
+	/* border: solid #cc816d 1px; */
+
+	/* Background */
+	background-color:white;
+
+	-webkit-box-shadow: 10px 0 15px 5px grey;
+	box-shadow: 10px 0 15px 5px grey;
+}
+.stuko_dict_header{
+	padding-top:10px;
+	margin: 15px;
+	/* border-bottom: solid 2px #cc816d; */
+}
+.stuko_dict_header>h2{
+	height:70px;
+	font-size:1.8rem;
+}
+
+/* Board :: Search */
+.stuko_dcit_search{
+	display: inline-block;
+	height: 40px;
+
+	width: calc(100% - 150px);
+	overflow: hidden;
+
+	border: solid #cc816d 1px;
+	border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	-ms-border-radius: 10px;
+	-o-border-radius: 10px;
+}
+.stuko_dcit_search>input{
+	display: block;
+	float: left;
+	
+	width: calc(100% - 38px);
+	height: 100%;
+	padding: 10px;
+
+	border: none;
+	outline: none;
+	
+    color: #cc816d;
+	font-size: 1.2rem;
+}
+.stuko_dcit_search>input:-ms-input-placeholder {
+	color: #cc816d
+}
+.stuko_dcit_search>input::-webkit-input-placeholder {
+	color: #cc816d;
+}
+.stuko_dcit_search>input::-moz-placeholder {
+	color: #cc816d;
+}
+.stuko_dcit_search>button{
+	width: 38px;
+	height: 100%;
+	
+	background-color: white;
+
+	font-size: 1.5rem;
+}
+.stuko_dict_regi_btn{
+	width: 136px;
+	height: 40px;
+	margin-left: 8px;
+
+    vertical-align: top;
+	
+	font-size: 1rem;
+	font-weight: bold;
+}
+.stuko_word_list{
+
+	height: calc(100% - 160px);
+
+	padding-left: 15px;
+	
+	overflow-y: scroll;
+}
+
+.stuko_word{
+	border-left: solid 2px darkgrey;
+
+	list-style: disc;
+	list-style-position: inside;
+}
+.stuko_word:not(:last-child){
+	margin-bottom:40px;
+}
+
+.stuko_word_time {
+	padding-left: 10px;
+	height: 35px;
+	/* background-color: #fafafa; */
+	
+	color: darkgrey;
+	font-weight: bolder;
+}
+.stuko_word_time>i {
+	margin-left: 10px;
+
+	cursor: pointer;
+}
+.righter {
+	float:right;
+	margin-top: 9px;
+	margin-right: 15px;
+}
+.stuko_word_time>button {
+	float:right;
+	margin-right: 5px;
+	vertical-align: bottom;
+
+	width:50px;
+	height:30px;
+
+	font-weight: bold;
+}
+.word_desc{
+	padding-left: 20px;
+	padding-right: 15px;
+	
+    text-align: justify;
+}
+.word_desc > .stuko_dict_link{
+	color:blue;
+	cursor: pointer;
+}
+.word_ref_list{
+	padding-left: 40px;
+	margin-top: 10px;
+
+	line-height: 1.2rem;
+}
+.word_ref_list>div:first-child{
+	margin: 10px 0px;
+}
+li.word_ref{
+	font-size:0.9rem;
+	margin-left: 20px;
+	
+	list-style: disc;
+}
+li.word_ref:not(:last-child){
+	padding-bottom:15px;
+}
+.stuko_word_init,
+.stuko_word_not_found{
+	color: darkgray;
+	
+    font-size: 29px;
+    font-weight: bold;
+    line-height: 5rem;
+    text-align: center;
+}
+.stuko_word_init{
+	padding-top: 200px;
+}
+.stuko_word_not_found>img{
+	margin-top:150px;
+    width: 247px;
+    height: 258px;
+}
+.stuko_word_icon{
+	margin-left: -12px !important;
+	font-size: 29px;
+	vertical-align: bottom;
+}
+.registered_word{
+	color: blue;
+	cursor: pointer;
+}
+
+/** BEGIN CSS **/
+@keyframes rotate-loading {
+	0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
+	100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+}
+
+@-moz-keyframes rotate-loading {
+	0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
+	100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+}
+
+@-webkit-keyframes rotate-loading {
+	0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
+	100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+}
+
+@-o-keyframes rotate-loading {
+	0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
+	100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+}
+
+@keyframes rotate-loading {
+	0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
+	100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+}
+
+@-moz-keyframes rotate-loading {
+	0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
+	100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+}
+
+@-webkit-keyframes rotate-loading {
+	0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
+	100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+}
+
+@-o-keyframes rotate-loading {
+	0%  {transform: rotate(0deg);-ms-transform: rotate(0deg); -webkit-transform: rotate(0deg); -o-transform: rotate(0deg); -moz-transform: rotate(0deg);}
+	100% {transform: rotate(360deg);-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); -o-transform: rotate(360deg); -moz-transform: rotate(360deg);}
+}
+
+/* @keyframes loading-text-opacity {
+	0%  {opacity: 0}
+	20% {opacity: 0}
+	50% {opacity: 1}
+	100%{opacity: 0}
+}
+
+@-moz-keyframes loading-text-opacity {
+	0%  {opacity: 0}
+	20% {opacity: 0}
+	50% {opacity: 1}
+	100%{opacity: 0}
+}
+
+@-webkit-keyframes loading-text-opacity {
+	0%  {opacity: 0}
+	20% {opacity: 0}
+	50% {opacity: 1}
+	100%{opacity: 0}
+}
+
+@-o-keyframes loading-text-opacity {
+	0%  {opacity: 0}
+	20% {opacity: 0}
+	50% {opacity: 1}
+	100%{opacity: 0}
+} */
+
+.loading-bg{
+	display: none;
+	position: absolute;
+	top: 160px;
+	left: 0px;
+	z-index: 3;
+	height: 100%;
+	width: 100%;
+    background-color: white;
+}
+.loading-container,
+.loading {
+	padding-top:100px;
+	height: 200px;
+	position: relative;
+	width: 200px;
+	border-radius: 100%;
+}
+
+
+.loading-container { margin: 40px auto }
+
+.loading {
+	border: 2px solid transparent;
+	/* border-color: transparent #fff transparent #FFF; */
+	border-color: transparent #E45635 transparent #E45635;
+	-moz-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-moz-transform-origin: 50% 50%;
+	-o-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-o-transform-origin: 50% 50%;
+	-webkit-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-webkit-transform-origin: 50% 50%;
+	animation: rotate-loading 1.5s linear 0s infinite normal;
+	transform-origin: 50% 50%;
+}
+.loading-container:hover .loading,
+.loading-container .loading {
+	-webkit-transition: all 0.5s ease-in-out;
+	-moz-transition: all 0.5s ease-in-out;
+	-ms-transition: all 0.5s ease-in-out;
+	-o-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+}
+
+#loading-text {
+	/* -moz-animation: loading-text-opacity 2s linear 0s infinite normal;
+	-o-animation: loading-text-opacity 2s linear 0s infinite normal;
+	-webkit-animation: loading-text-opacity 2s linear 0s infinite normal; */
+	/* animation: loading-text-opacity 2s linear 0s infinite normal; */
+	color: #E45635;
+	font-family: "Helvetica Neue, "Helvetica", ""arial";
+	font-size: 20px;
+	font-weight: bold;
+	/* margin-top: 180px; */
+	/* opacity: 0; */
+	position: absolute;
+	text-align: center;
+	text-transform: uppercase;
+	top: 0;
+	width: 200px;
+	height: 200px;
+	vertical-align: middle;
+	padding-top: 180px;
+}
+

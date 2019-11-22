@@ -1,5 +1,8 @@
 package com.stuko.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,16 +36,19 @@ public class DictController {
 	@ResponseBody
 	@GetMapping("/*")
 	public WordDTO getDefs(
-		HttpServletRequest request, 
-		HttpServletResponse resp) {
+			HttpServletRequest request, 
+			HttpServletResponse resp) 
+		throws UnsupportedEncodingException {
 		
 		String uri = request.getRequestURI();
 		String courseId = restHelper.getCourseId(uri);
 		String word = restHelper.getWord(uri);
+		String decodedWord = URLDecoder.decode(word, "UTF-8");
 		WordDTO dto = new WordDTO();
 		
 		try {
-			dto = dictService.readWord(courseId, word);
+			dto = dictService.readWord(courseId, decodedWord);
+			
 		} catch (Exception e) {
 			resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		}

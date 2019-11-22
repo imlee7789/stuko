@@ -23,9 +23,6 @@
     <script async src="../../resources/js_new/stukoWebSocket.js"></script>
     
     <link rel="stylesheet" href="../../resources/css_new/stuko.css">
-    <link rel="stylesheet" href="../../resources/css_new/modal.css">
-
-    <script></script>
 
 </head>
 
@@ -39,18 +36,65 @@
                 <i class="fas fa-pencil-alt"></i>
                 <span>글 쓰기</span>
             </li>
-            <li class="stuko_btn">
+            <li id="dict_btn" class="stuko_btn">
                 <i class="fas fa-book"></i>
                 <span>용어 사전</span>
             </li>
         </ul>
         <footer>
-            <div class="stuko_btn">
+            <div id="home_btn" class="stuko_btn">
                 <i class="fas fa-home"></i>
                 <span>홈페이지</span>
             </div>
         </footer>
     </nav>
+    
+    <div class="stuko_dict">
+        <header class="stuko_dict_header">
+            <h2>용어 사전</h2>
+            <div class="stuko_dcit_search">
+                <input type="text" placeholder="용어 검색">
+                <button class="stuko_text_btn"><i class="fas fa-search"></i></button>
+            </div>
+            <button class="stuko_btn stuko_dict_regi_btn">용어 추가</button>
+        </header>
+        <div class="loading-bg">
+            <div class="loading-container">
+                <div class="loading"></div>
+                <div id="loading-text">loading</div>
+            </div>
+        </div>
+        <div class="stuko_word_list">
+            <div class="stuko_word_init">
+				검색하고 싶은 단어를 입력하세요
+            </div>
+            
+         
+			<!-- <div class="stuko_word" style="display: none;">
+				<div class="stuko_word_time">
+					<time> 2019/10/14 12:34 </time>
+					<i class="stuko_text_btn far fa-thumbs-up"><span> 44</span></i> 
+					<i class="stuko_text_btn far fa-trash-alt righter"></i>
+					<i class="stuko_text_btn modal_bulletin_update_btn far fa-edit righter"></i>
+				</div>
+				<div class="word_desc">
+					<span class="stuko_dict_link">썬마이크로시스템즈(썬)</span>에서 최초 발표한 언어이다.
+					오우크(Oak)언어에서부터 시작해서 인터넷 프로그래밍 언어로 발전하면서, 자바라는 이름으로 변경되었다.
+				</div>
+				<ul class="word_ref_list">
+					<li class="word_ref">
+						<div class="word_ref_desc">이것이 자바다 yes24</div>
+						<a class="word_ref_url" href="#"> https://www.yes24.com?name=이것이 자바다 </a>
+					</li>
+					<li class="word_ref">
+						<div class="word_ref_desc">생활코딩 자바</div>
+						<a class="word_ref_url" href="#"> https://www.opentutorials.org/course/1223 </a>
+					</li>
+				</ul>
+			</div> -->
+			
+		</div>
+    </div>
 
     <div class="stuko_board">
         <div id="stuko_hottopic">

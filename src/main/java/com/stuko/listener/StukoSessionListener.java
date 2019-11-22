@@ -22,9 +22,11 @@ public class StukoSessionListener implements HttpSessionListener {
 		
 		HttpSession hSession = se.getSession();
 		
-		String nickName = hSession.getAttribute("nickName").toString();
-		
-		NickName.putNickName(nickName);
+		if(hSession.getAttribute("nickName") != null) {
+			String nickName = hSession.getAttribute("nickName").toString();
+			
+			NickName.putNickName(nickName);
+		}
 
 	}
 

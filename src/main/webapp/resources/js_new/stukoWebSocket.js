@@ -55,6 +55,7 @@
 		var height = $(id).height();
     	
 		if ( scrollHeight - height - top < 50) {
+//		if ( scrollHeight - height - top == 0) {
 			return true;
         }
         return false;
@@ -154,7 +155,7 @@
 		}
 		
 		$.ajax({
-			url: "/stuko/1/timeline/" + id,
+			url: _AjaxURI + "/timeline/" + id,
 			type: "post",
 			data: data,
 			dataType: "json",
@@ -201,7 +202,7 @@
     		};
     		
         	$.ajax({
-    			url: "/stuko/1/timeline/" + id,
+    			url: _AjaxURI + "/timeline/" + id,
     			type: "delete",
     			dataType: "json",
     			data: data,
@@ -303,7 +304,7 @@
     // session destroy까지 막아야할 것으로 보인다.
     function articleRcmdUp(id){
     	$.ajax({
-			url: "/stuko/1/timeline/" + id,
+			url: _AjaxURI + "/timeline/" + id,
 			type: "patch",
 			dataType: "json",
 			success: function(detail){
@@ -315,7 +316,8 @@
             	
             	var opt = {
             			bodyHtml: bodyHtml,
-            			headText: "Recommend"
+            			headText: "Recommend",
+            			isCancelBtn: false
             	};
             	
             	var rcmdSpan = $(".modal_bulletin_rcmd_btn");
@@ -326,6 +328,15 @@
             	var confirm = new Modal(opt);
             	
             	confirm.create();
+            	
+            	var articles = $(".stuko_article");
+            	
+            	for(var i=0; i<articles.length; i++){
+                	var dataId = $(articles[i]).attr("data-id");
+                	if(dataId == id){
+                		$(articles[i]).find("h3>i>span").text(rcmdCnt);
+                	}
+            	}
             	
 			},
 			error:function(data){
@@ -350,7 +361,7 @@
     function ArticleDetailModal(id){
     	
     	$.ajax({
-			url: "/stuko/1/timeline/" + id,
+			url: _AjaxURI + "/timeline/" + id,
 			type: "get",
 			dataType: "json",
 			success: function(detail){
@@ -368,7 +379,7 @@
     function ArticleDetialModalStep2(detail, id){
     	
     	$.ajax({
-			url: "/stuko/1/timeline/" + id + "/comment",
+			url: _AjaxURI + "/timeline/" + id + "/comment",
 			type: "get",
 			dataType: "json",
 			success: function(respCommentList){
@@ -395,7 +406,7 @@
     	console.log(data);
     	
 		$.ajax({
-			url: "/stuko/1/timeline/" + id,
+			url: _AjaxURI + "/timeline/" + id,
 			type: "put",
 			data: data,
 			dataType: "json",
@@ -445,7 +456,7 @@
     	console.log("_openUpdateModal() invoked.");
 
     	$.ajax({
-			url: "/stuko/1/timeline/" + id,
+			url: _AjaxURI + "/timeline/" + id,
 			type: "get",
 			dataType: "json",
 			success: function(detail){
@@ -799,6 +810,7 @@
         var _article = 
                 $("<div></div>").
                 addClass("stuko_article").
+                attr("data-id", data.id).
                 on("click", function(){
 		        		ArticleDetailModal(data.id);
 		        });
@@ -842,8 +854,12 @@
 
         var commentCnt =
                 $("<div></div>").
-                text("<span>" + data.comment_cnt + "</span>");
+                html("<span>댓글 " + data.comment_cnt + "</span>");
 
+        footer.
+	        append(time).
+	        append(commentCnt);
+        
         _article.
             append(header).
             append(body).
@@ -919,6 +935,9 @@
     /****************************************
     *   Board
     ****************************************/
+    var isReadyLoadTimeline = true;
+    
+    
     function renderHotTopic(){
 		$.ajax({
 			url: _AjaxURI + "/timeline/hottopic",
@@ -952,32 +971,77 @@
 		});
     }
 
-    function renderTimeline(){
+    function renderTimeline(pageStart, length){
+    	console.log("renderTimeline() invoked.");
+
+    	var data = {
+    			pageStart: pageStart,
+    			length: length
+    	};
+    	
 		$.ajax({
 			url: _AjaxURI + "/timeline",
 			type: "get",
 			dataType: "json",
+			data: data,
 			success: function(articleList){
                 var timeline = $(".stuko_article_list");
                 
                 for(var i=0; i<articleList.length; i++){
+                	console.log(articleList[i].id);
                 	
                     var article = new Article(articleList[i]);
                     
                     timeline.append(article);
                 }
+                
+                isReadyLoadTimeline = true;
 
 			},
 			error:function(data){
 				console.log("error : " ,data);
+
+                isReadyLoadTimeline = true;
 			}
 		});
+	};
+	
+	function renderTimelineOnScroll(){
+		
+		var timelineLen = 5;
+		
+		$(".stuko_article_list").
+			scroll(function(){
+				console.log("scroll event invoked.");
+				
+				var isBottom = isScrollBottom(".stuko_article_list");
+
+				if(isBottom){
+					
+					if(isReadyLoadTimeline){
+						isReadyLoadTimeline = false;
+							
+						// 타임라인을 어펜드해야한다.
+						// but, 마지막 글의 아이디를 알고 있어야 한다.
+						// 2019.11.17 lhs : 아이디가 아닌 글의 개수가 몇 개 인지 확인해야한다.
+						var articles = $(".stuko_article");
+						var articleLenLoaded = articles.length;
+						
+						renderTimeline(articleLenLoaded, timelineLen);
+						
+					}
+					
+				}
+			}
+		);
+		
 	};
 
     function _BoardInit(){
     	console.log("_BoardInit() invoked.");
 		renderHotTopic();
-		renderTimeline();
+		renderTimeline(0, 10);
+		renderTimelineOnScroll();
     };
    
 
@@ -1084,7 +1148,7 @@
     	console.log(data);
     	
 		$.ajax({
-			url: "/stuko/1/timeline",
+			url: _AjaxURI + "/timeline",
 			type: "post",
 			data: data,
 			dataType: "json",
@@ -1215,16 +1279,163 @@
         	
     	var writeModal = new Modal(opt);
     	
-    	writeModal.create();
-    	
+    	writeModal.create();	
     }
     
     function _NaviInit(){
     	$("#write_btn").on("click", function(){
     		_openWriteModal();
     	});
-    }
+    	$("#home_btn").on("click", function(){
+    		location.replace("/");
+    	});
+	}
 
+	function toggleDictionary() {
+		console.log("toggleDictionary() invoked.");
+		
+		var dict = $(".stuko_dict");
+		var status = dict.css("display");
+		var dictBtn = $("#dict_btn");
+		
+		if(status == "none"){
+			dict.show("slide", 300);
+			dictBtn.addClass("stuko_nav_toggle");
+
+		}else{
+			dict.hide("slide", 500);
+			dictBtn.removeClass("stuko_nav_toggle");
+		}
+	}
+	
+	function getWordTemplate(def){
+
+        var date = new Date(def.insert_ts);
+        var time =
+                date.getFullYear() + "/" + 
+                (date.getMonth() + 1) + "/" + 
+                date.getDate() + " " + 
+                pad(date.getHours(), 2) + ":" + 
+                pad(date.getMinutes(), 2);
+		
+		var template = 
+			"<div class='stuko_word'>" +
+				"<div class='stuko_word_time'>" +
+					"<i class='fa fa-ad stuko_word_icon'></i>" +
+					"<time> " + time + " </time>" +
+					"<i class='stuko_text_btn far fa-thumbs-up'><span> " + def.rcmd_cnt + "</span></i>" + 
+					"<i class='stuko_text_btn far fa-trash-alt righter'></i>" +
+					"<i class='stuko_text_btn modal_bulletin_update_btn far fa-edit righter'></i>" +
+				"</div>" +
+				"<div class='word_desc'>" +
+				def.content +
+				"</div>" +
+			"<ul class='word_ref_list'>";
+		
+		for(var i=0; i<def.refs.length; i++){
+			template += 
+				"<li class='word_ref'>" +
+					"<div class='word_ref_desc'>" + def.refs[i].description + "</div>" +
+					"<a class='word_ref_url' target='_black' href='" + def.refs[i].url + "'>" + def.refs[i].url + "</a>" +
+				"</li>";
+		}
+
+		template += "</ul></div>";
+		
+		return template;
+	}
+	
+	function renderWords(defs){
+		
+		var wordList = $(".stuko_word_list");
+
+		wordList.text("");
+		
+		for(var i=0; i<defs.length; i++){
+			var template = getWordTemplate(defs[i]);
+			
+			wordList.append(template);
+		}
+		
+		var words = wordList.find(".registered_word");
+		
+		console.log(words);
+		
+		for(var i=0; i<words.length; i++){
+//			console.log($(words[i]).text());
+//			console.log(words[i]);
+//			console.log($(words[i]));
+			$(words[i]).on("click", function(){
+				console.log($(words[i]).text());
+				console.log($(this).text());
+				$(".stuko_dcit_search>input").val($(this).text());
+				searchWord();
+			});
+
+		}
+	}
+	
+	function renderNotFound(){
+		console.log("renderNotFound()");
+
+		var wordList = $(".stuko_word_list");
+
+		wordList.text("");
+		
+		var notfound = 
+		"<div class='stuko_word_not_found'>" +
+	        "<img src='../../resources/images/notfound.png'><br/>" +
+	        "일치하는 단어가 없습니다" +
+	    "</div>";
+		
+		wordList.append(notfound);
+	}
+
+	function searchWord(){
+		var searchWord = $(".stuko_dcit_search>input").val();
+
+		$(".loading-bg").show("fade", 300);
+		setTimeout(function(){
+			$.ajax({
+				url: _AjaxURI + "/dict/" + searchWord,
+				type: "get",
+				dataType: "json",
+				success: function(data){
+					
+					if(data !== undefined && data.defs.length > 0){
+						renderWords(data.defs);
+						
+					}else{
+						renderNotFound();
+					}
+					setTimeout(function(){
+						$(".loading-bg").hide("fade", 200);
+					},200);			
+				},
+				error:function(data){
+					console.log("error : ", data);
+					renderNotFound();
+					setTimeout(function(){
+						$(".loading-bg").hide("fade", 200);
+					},200);
+				}
+			});
+		},500);
+		
+	}
+
+	function _DictInit(){
+		console.log("_DictInit() invoked.");
+		$("#dict_btn").on("click", toggleDictionary);
+
+		$("button.stuko_text_btn").on("click",searchWord);
+
+		$(".stuko_dcit_search>input").on("keyup", function(e){
+			if(event.key == "Enter"){//enter
+				searchWord();
+			}
+		});
+	}
 
     /****************************************
     *   Initialize
@@ -1232,6 +1443,13 @@
     _BoardInit();
     _NaviInit();
     _WebSocketInit();
-    _ChatInit();
+	_ChatInit();
+	_DictInit();
+	
+	$(window).on("keydown", function (e) {
+		if(e.key === "ArrowRight" || e.key=== "ArrowLeft"){
+			return false;
+		}
+	});
     
 })();

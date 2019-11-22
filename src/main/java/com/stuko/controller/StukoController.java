@@ -22,8 +22,6 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -100,25 +98,28 @@ public class StukoController {
 	 * 	Bulletin Controller
 	 * 
 	******************************************************/
-	
-	// 0. timeline 초기화
+
+	// timeline read list which matches by criteria
 	@RequestMapping(value = "/*/timeline", method = RequestMethod.GET)
 	@ResponseBody
 	public List<BoardVO> listGET(
-			Criteria cri, 
+			@RequestParam("pageStart") int pageStart,
+			@RequestParam("length") int length,
+//			Criteria cri, 
 			HttpServletRequest request, 
 			uriCutter cutter
 		) throws Exception {
 
-		log.info("list GET --------------------");
+		log.info("listGET() invoked.");
 
-		int courseid = cutter.getCourseId(request);
+		int course_id = cutter.getCourseId(request);
+		
+		Criteria cri = new Criteria();
 
-		int length = 10;
-
+		cri.setPageStart(pageStart);
 		cri.setLength(length);
-		cri.setCourse_id(courseid);
-
+		cri.setCourse_id(course_id);
+		
 		List<BoardVO> list = service.readAll(cri);
 
 		return list;
@@ -130,14 +131,11 @@ public class StukoController {
 	public BoardVO registPOST(BoardDTO dto, HttpServletRequest request, HttpServletResponse response, uriCutter cutter)
 			throws Exception {
 
-		log.info("regist post--------------------");
-		log.info(dto.toString());
+		log.info("registPOST() invoked.");
 
 		int courseid = cutter.getCourseId(request);
 
 		dto.setCourse_id(courseid);
-
-		log.info(">>>>> courseid : " + courseid);
 
 		boolean isSucceed = service.regist(dto);
 		
@@ -187,7 +185,6 @@ public class StukoController {
 			uriCutter cutter) throws Exception {
 
 		log.info("BoardController :: remove invoked.");
-		log.info("password : " + dto.getUser_pw());
 		
 		int boardId = cutter.getBoardId(request);
 		
@@ -216,8 +213,6 @@ public class StukoController {
 
 		BoardVO vo = service.readOne(boardId);
 
-		log.info(">>>>>>> id : " + boardId);
-
 		return vo;
 	}
 
@@ -229,8 +224,6 @@ public class StukoController {
 		int comUseBoardId = cutter.getcomUseBoardId(request);
 
 		List<CommentVO> commentlist = cService.commentRead(comUseBoardId);
-
-		log.info(">>>>>>> id : " + comUseBoardId);
 
 		return commentlist;
 	}
@@ -314,11 +307,13 @@ public class StukoController {
 	// 6. 검색
 	@RequestMapping(value = "/*/timeline/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<BoardVO> listPage(SearchCriteria cri, HttpServletRequest request, uriCutter cutter) throws Exception {
+	public List<BoardVO> listPage(
+			SearchCriteria cri, 
+			HttpServletRequest request, 
+			uriCutter cutter) 
+		throws Exception {
 
 		log.info("SearchBoardController :: listPage() invoked.");
-		log.info(cri.toString());
-
 		int length = 10;
 
 		int course_id = cutter.getSerUseCourseId(request);
@@ -342,16 +337,9 @@ public class StukoController {
 
 		HttpSession session = (HttpSession) request.getSession();
 
-		log.info(">>>> session" + session);
-
 		String httpSessionId = session.getId();
 
-		log.info(">>>> httpSessionId" + httpSessionId);
-
 		String user_id = ssm.getNickName(httpSessionId);
-		//String user_id = dto.getUser_id();
-
-		log.info(">>>> user_id" + user_id);
 
 		dto.setUser_id(user_id);
 
@@ -371,16 +359,12 @@ public class StukoController {
 
 		int course_id = cutter.getSerUseCourseId(request);
 
-		log.info("course_id>>>>>>>>>>>>> : " + course_id);
-
 		Date insert_ts = cal.getTime();
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		String insertts = format.format(insert_ts);
 
 		hotTopic.setCourse_id(course_id);
 		hotTopic.setInsert_ts(insertts);
-
-		log.info("insert_ts>>>>>>>>>>>>> : " + insert_ts);
 
 		BoardVO vo = service.readHotTopic(hotTopic);
 
@@ -475,10 +459,8 @@ public class StukoController {
 		} else if(reqType == Message.REQ_NICK) {
 			
 			String nickName = ssm.getNickName(session);
-			log.info("현재 닉네임: " + nickName);
 			
 			nickName = NickName.changeNickName(nickName);
-			log.info("바뀐 닉네임:  " + nickName);
 			
 			// 2019.10.10 ssm에서 nickChange를 해줘야한다.
 			// 2019.10.20 ssm에서 닉을 변경하고 httpSession의 nick도 변경해야한다.

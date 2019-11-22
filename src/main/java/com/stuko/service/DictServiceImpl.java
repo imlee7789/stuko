@@ -55,11 +55,39 @@ public class DictServiceImpl
 			ddtos[i] = new DefinitionDTO();
 			
 			ddtos[i].setId(dvo.getId());
-			ddtos[i].setContent(dvo.getContent());
+			
+			// 모든 단어를 긁어온다.
+			String content = dvo.getContent();
+
+			WordVO wvo4search =  new WordVO();
+			wvo4search.setCourse_id(Integer.valueOf(courseId));
+			wvo4search.setWord_name("");
+			
+			List<String> words = wordDAO.readWordsMatched(wvo4search);
+			
+//			String[] words = {"자바", "자바스크립트", "오라클", "관계형 데이터베이스", "썬 마이크로시스템즈"};
+//			Arrays.sort(words);
+			
+			words.sort((a,b) -> (a.length()-b.length()));
+
+			String parsedContent = content;
+			
+			for(int j=words.size()-1; j>=0; j--) {
+				String[] split = parsedContent.split(words.get(j));
+				
+				String tmp = split[0];
+				for(int k=1; k<split.length; k++) {
+					tmp += "<b class='registered_word'>" + words.get(j) + "</b>" + split[k];
+				}
+				
+				parsedContent = tmp;
+			}
+						
+			ddtos[i].setContent(parsedContent);
 			ddtos[i].setInsert_ts(dvo.getInsert_ts());
 			ddtos[i].setRcmd_cnt(dvo.getRcmd_cnt());
 
-			// List<RefSiteVO> to RefSiteDTO[Array] 
+			// List<RefSiteVO> to RefSiteDTO[Array]
 			List<RefSiteVO> refvoList = new ArrayList<RefSiteVO>();
 			RefSiteDTO[] refdtos = null;
 			

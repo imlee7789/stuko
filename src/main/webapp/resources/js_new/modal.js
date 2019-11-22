@@ -274,13 +274,15 @@ Modal = function(option){
         		$("<button></button>").
         		addClass("stuko_btn stuko_modal_button_cancel").
         		text(_option.cancelBtnText);
-        	
+
         	if(_option.isOkBtn){
         		btnOk.on("click", function(event){
     				_destroy(_option.okBtnCallback);
         		});
+            	footer.
+            	append(btnOk);
         	}
-        	
+
         	if(_option.isCancelBtn){
         		btnCancel.on("click", function(event){
         			_destroy();
@@ -290,12 +292,13 @@ Modal = function(option){
         				_option.cancelCallback();
         			});
         		}
+            	footer.
+            	append(btnCancel);
         	}
-        	
-        	
-        	footer.
-        	append(btnOk).
-        	append(btnCancel);
+
+//        	footer.
+//        	append(btnOk).
+//        	append(btnCancel);
         	
         	content.append(footer);
         }

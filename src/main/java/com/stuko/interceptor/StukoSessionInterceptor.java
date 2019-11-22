@@ -23,20 +23,33 @@ public class StukoSessionInterceptor extends HandlerInterceptorAdapter {
 		
 		uriCutter uc = new uriCutter();
 		
-		
 		log.info("StukoSessionInterceptor::preHandle()");
 
 		HttpSession session = request.getSession(true);
-		if(session.getAttribute("nickName") == null) {
-			System.out.println("########null#######");
-		}
+		
 		if (session.getAttribute("nickName") == null || session.getAttribute("courseId") == null) {
-			String nickName = NickName.randomNick();
+			System.out.println("nickName is null");
 			
-			String courseId = Integer.toString(uc.getCourseIdInIct(request));
+			response.sendRedirect("/");
+			
+			return false;
+//			String nickName = NickName.randomNick();
+//			
+//			String courseId = Integer.toString(uc.getCourseIdInIct(request));
+//
+//			session.setAttribute("nickName", nickName);
+//			session.setAttribute("courseId", courseId);
+		}
+		
+		String[] uris = request.getRequestURI().split("/");
+		
+		System.out.println("###############"+uris[2]);
+		System.out.println(session.getAttribute("courseId"));
+		if(!session.getAttribute("courseId").toString().equals(uris[2])) {
 
-			session.setAttribute("nickName", nickName);
-			session.setAttribute("courseId", courseId);
+			response.sendRedirect("/");
+			
+			return false;
 		}
 
 		return true;

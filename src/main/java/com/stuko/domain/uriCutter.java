@@ -1,7 +1,5 @@
 package com.stuko.domain;
 
-import java.util.Arrays;
-
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.AllArgsConstructor;
