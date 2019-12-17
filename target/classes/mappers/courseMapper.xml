@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.stuko.mapper.CourseMapper">
+
+	<insert id="createCourse">
+		INSERT INTO 
+			tbl_course 
+			(conn_pw, course_name, description) 
+		VALUES 
+			(#{conn_pw}, #{course_name}, #{description})
+	</insert>
+
+	<select id="readCourse" resultType="com.stuko.domain.CourseVO">
+		SELECT * FROM tbl_course
+	</select>
+
+	<select id="connectCourse" resultType="com.stuko.domain.CourseVO">
+		SELECT 
+			* 
+		FROM 
+			tbl_course
+		WHERE 
+			conn_pw=#{conn_pw} AND
+			id=#{id}
+	</select>
+	
+	<update id="updateCourse">
+		UPDATE
+			tbl_course
+		SET 
+			conn_pw=#{conn_pw}, 
+			ch_name=#{course_name}, 
+			description=#{description}
+	</update>
+	
+	<delete id="deleteCourse">
+		DELETE FROM 
+			tbl_course 
+		WHERE 
+			(id=#{id})
+	</delete>
+	
+</mapper>
